@@ -1,0 +1,519 @@
+/**
+==========================================================
+YES FREE ERP
+Módulo Clientes
+frontend/js/clientes.html
+==========================================================
+*/
+
+
+let clienteAtual = null;
+
+
+
+/**
+ * Tela clientes
+ */
+function telaClientes(){
+
+
+ criarHTML(`
+
+
+ <div class="card">
+
+
+ <h2>
+ Clientes Consumidor
+ </h2>
+
+
+ <button 
+ class="btn-primary"
+ onclick="novoCliente()">
+
+ Novo Cliente
+
+ </button>
+
+
+ <br><br>
+
+
+ <div id="listaClientes">
+
+ Carregando...
+
+ </div>
+
+
+ </div>
+
+
+ `);
+
+
+
+ listarClientes();
+
+
+}
+
+
+
+/**
+ * Buscar clientes
+ */
+function listarClientes(){
+
+
+ google.script.run
+
+
+ .withSuccessHandler(function(lista){
+
+
+ let html = `
+
+
+ <table>
+
+
+ <tr>
+
+ <th>ID</th>
+
+ <th>Nome</th>
+
+ <th>Telefone</th>
+
+ <th>Cidade</th>
+
+ <th>Ações</th>
+
+ </tr>
+
+
+ `;
+
+
+
+ lista.forEach(function(c){
+
+
+
+ html += `
+
+
+ <tr>
+
+
+ <td>
+ ${c.id}
+ </td>
+
+
+ <td>
+ ${c.nome}
+ </td>
+
+
+ <td>
+ ${c.telefone || ""}
+ </td>
+
+
+ <td>
+ ${c.cidade || ""}
+ </td>
+
+
+ <td>
+
+
+ <button
+ onclick="editarCliente('${c.id}')">
+
+ Editar
+
+ </button>
+
+
+
+ <button
+ onclick="whatsappCliente('${c.id}')">
+
+ WhatsApp
+
+ </button>
+
+
+ </td>
+
+
+ </tr>
+
+
+
+ `;
+
+
+
+ });
+
+
+
+ html += "</table>";
+
+
+
+ document
+
+ .getElementById(
+ "listaClientes"
+ )
+
+ .innerHTML =
+ html;
+
+
+
+ })
+
+
+ .apiListarClientes();
+
+
+
+}
+
+
+
+/**
+ * Novo cliente
+ */
+function novoCliente(){
+
+
+ criarHTML(`
+
+
+ <div class="card">
+
+
+ <h2>
+ Cadastro Cliente
+ </h2>
+
+
+ <div class="form-grid">
+
+
+
+ <div class="form-group">
+
+ <label>
+ Nome Completo
+ </label>
+
+ <input id="cli_nome">
+
+ </div>
+
+
+
+ <div class="form-group">
+
+ <label>
+ CPF/CNPJ
+ </label>
+
+ <input id="cli_documento">
+
+ </div>
+
+
+
+ <div class="form-group">
+
+ <label>
+ Telefone
+ </label>
+
+ <input id="cli_telefone">
+
+ </div>
+
+
+
+ <div class="form-group">
+
+ <label>
+ WhatsApp
+ </label>
+
+ <input id="cli_whatsapp">
+
+ </div>
+
+
+
+ <div class="form-group">
+
+ <label>
+ Email
+ </label>
+
+ <input id="cli_email">
+
+ </div>
+
+
+
+ <div class="form-group">
+
+ <label>
+ Cidade
+ </label>
+
+ <input id="cli_cidade">
+
+ </div>
+
+
+
+ <div class="form-group">
+
+ <label>
+ Endereço
+ </label>
+
+ <input id="cli_endereco">
+
+ </div>
+
+
+ </div>
+
+
+ <br>
+
+
+ <button
+
+ class="btn-success"
+
+ onclick="salvarCliente()">
+
+ Salvar Cliente
+
+ </button>
+
+
+
+ </div>
+
+
+
+ `);
+
+
+}
+
+
+
+/**
+ * Salvar cliente
+ */
+function salvarCliente(){
+
+
+
+ let dados = {
+
+
+ nome:
+ document
+ .getElementById(
+ "cli_nome"
+ )
+ .value,
+
+
+ cpf:
+ document
+ .getElementById(
+ "cli_documento"
+ )
+ .value,
+
+
+ telefone:
+ document
+ .getElementById(
+ "cli_telefone"
+ )
+ .value,
+
+
+ whatsapp:
+ document
+ .getElementById(
+ "cli_whatsapp"
+ )
+ .value,
+
+
+ email:
+ document
+ .getElementById(
+ "cli_email"
+ )
+ .value,
+
+
+ cidade:
+ document
+ .getElementById(
+ "cli_cidade"
+ )
+ .value,
+
+
+ endereco:
+ document
+ .getElementById(
+ "cli_endereco"
+ )
+ .value
+
+
+ };
+
+
+
+ google.script.run
+
+
+ .withSuccessHandler(function(r){
+
+
+ alerta(
+ "Cliente cadastrado"
+ );
+
+
+ telaClientes();
+
+
+
+ })
+
+
+ .apiSalvarCliente(
+ dados
+ );
+
+
+}
+
+
+
+/**
+ * Editar cliente
+ */
+function editarCliente(
+id
+){
+
+
+ google.script.run
+
+
+ .withSuccessHandler(function(cliente){
+
+
+
+ clienteAtual =
+ cliente;
+
+
+
+ novoCliente();
+
+
+
+ document
+ .getElementById(
+ "cli_nome"
+ )
+ .value =
+ cliente.nome;
+
+
+
+ document
+ .getElementById(
+ "cli_documento"
+ )
+ .value =
+ cliente.cpf;
+
+
+
+ document
+ .getElementById(
+ "cli_telefone"
+ )
+ .value =
+ cliente.telefone;
+
+
+
+ document
+ .getElementById(
+ "cli_email"
+ )
+ .value =
+ cliente.email;
+
+
+
+ })
+
+
+ .apiBuscarCliente(
+ id
+ );
+
+
+}
+
+
+
+/**
+ * WhatsApp cadastro
+ */
+function whatsappCliente(
+id
+){
+
+
+ google.script.run
+
+
+ .withSuccessHandler(function(link){
+
+
+ abrirWhatsapp(link);
+
+
+ })
+
+
+ .enviarWhatsappCadastro(
+ id
+ );
+
+
+}
