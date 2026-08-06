@@ -1,10 +1,18 @@
 /**
 ==========================================================
-YES FREE ERP
+KATIENE BARBOSA YES ERP
 produtos.js
 Cadastro / Consulta / Edição / Exclusão de Produtos
-Integração:
-Frontend → Api.gs → Produtos.gs → Google Sheets
+
+Frontend
+↓
+chamarAPI()
+↓
+Api.gs
+↓
+Produtos.gs
+↓
+Google Sheets
 ==========================================================
 */
 
@@ -21,18 +29,22 @@ TELA PRODUTOS
 ==========================================================
 */
 
+
 function telaProdutos(){
 
 
-criarHTML(`
+
+renderizar(`
+
 
 <div class="card">
 
 
 <h2>
-Cadastro de Produtos
-</h2>
 
+Cadastro de Produtos
+
+</h2>
 
 
 
@@ -43,132 +55,153 @@ Cadastro de Produtos
 <div class="form-group">
 
 <label>
+
 Código
+
 </label>
 
 
 <input id="produto_codigo">
 
-</div>
 
+</div>
 
 
 
 <div class="form-group">
 
 <label>
+
 Nome Produto
+
 </label>
 
 
 <input id="produto_nome">
 
-</div>
 
+</div>
 
 
 
 <div class="form-group">
 
 <label>
+
 Categoria
+
 </label>
 
 
 <input id="produto_categoria">
 
-</div>
 
+</div>
 
 
 
 <div class="form-group">
 
 <label>
+
 Unidade
+
 </label>
 
 
-<input 
-id="produto_unidade"
-value="UN">
+<input id="produto_unidade" value="UN">
+
 
 </div>
-
 
 
 
 <div class="form-group">
 
 <label>
-Preço Revenda
-</label>
 
-
-<input 
-id="produto_preco_revenda"
-type="number">
-
-</div>
-
-
-
-
-<div class="form-group">
-
-<label>
 Preço Consumidor
+
 </label>
 
 
-<input 
+<input
+
 id="produto_preco_consumidor"
-type="number">
+
+type="number"
+
+step="0.01"
+
+>
+
 
 </div>
-
 
 
 
 <div class="form-group">
 
 <label>
+
+Preço Revenda
+
+</label>
+
+
+<input
+
+id="produto_preco_revenda"
+
+type="number"
+
+step="0.01"
+
+>
+
+
+</div>
+
+
+
+<div class="form-group">
+
+<label>
+
 Estoque Inicial
+
 </label>
 
 
-<input 
+<input
+
 id="produto_estoque"
-type="number">
+
+type="number"
+
+>
+
 
 </div>
-
 
 
 
 <div class="form-group">
 
 <label>
+
 Estoque Mínimo
+
 </label>
 
 
-<input 
+<input
+
 id="produto_estoque_minimo"
-type="number">
 
-</div>
+type="number"
 
-
-
-<div class="form-group">
-
-<label>
-Observações
-</label>
-
-
-<textarea id="produto_observacao"></textarea>
+>
 
 
 </div>
@@ -183,12 +216,13 @@ Observações
 <br>
 
 
-
 <button
 
 class="btn-primary"
 
-onclick="salvarProduto()">
+onclick="salvarProduto()"
+
+>
 
 Salvar Produto
 
@@ -200,7 +234,9 @@ Salvar Produto
 
 class="btn-success"
 
-onclick="carregarProdutos()">
+onclick="buscarProdutos()"
+
+>
 
 Consultar
 
@@ -208,9 +244,7 @@ Consultar
 
 
 
-
 <hr>
-
 
 
 <div id="lista_produtos">
@@ -219,15 +253,15 @@ Consultar
 
 
 
-
 </div>
+
 
 
 `);
 
 
 
-carregarProdutos();
+buscarProdutos();
 
 
 
@@ -241,12 +275,12 @@ SALVAR PRODUTO
 ==========================================================
 */
 
-function salvarProduto(){
+
+async function salvarProduto(){
 
 
 
 const dados = {
-
 
 
 id:
@@ -294,20 +328,6 @@ document.getElementById(
 
 
 
-precoRevenda:
-
-Number(
-
-document.getElementById(
-
-"produto_preco_revenda"
-
-).value
-
-||0),
-
-
-
 precoConsumidor:
 
 Number(
@@ -316,9 +336,23 @@ document.getElementById(
 
 "produto_preco_consumidor"
 
-).value
+).value || 0
 
-||0),
+),
+
+
+
+precoRevenda:
+
+Number(
+
+document.getElementById(
+
+"produto_preco_revenda"
+
+).value || 0
+
+),
 
 
 
@@ -330,9 +364,9 @@ document.getElementById(
 
 "produto_estoque"
 
-).value
+).value || 0
 
-||0),
+),
 
 
 
@@ -344,19 +378,9 @@ document.getElementById(
 
 "produto_estoque_minimo"
 
-).value
+).value || 0
 
-||0),
-
-
-
-observacoes:
-
-document.getElementById(
-
-"produto_observacao"
-
-).value
+)
 
 
 
@@ -365,24 +389,25 @@ document.getElementById(
 
 
 
-executar(
+const resposta =
 
-"apiSalvarProduto",
+await executarAPI(
 
-dados,
+"salvarProduto",
 
-function(res){
+dados
+
+);
 
 
 
-if(res.sucesso){
+if(resposta.sucesso){
+
 
 
 mensagem(
 
-"Produto salvo",
-
-"sucesso"
+"Produto salvo com sucesso"
 
 );
 
@@ -392,7 +417,7 @@ limparProduto();
 
 
 
-carregarProdutos();
+buscarProdutos();
 
 
 
@@ -403,7 +428,7 @@ else{
 
 mensagem(
 
-res.mensagem,
+resposta.mensagem,
 
 "erro"
 
@@ -417,12 +442,6 @@ res.mensagem,
 
 }
 
-);
-
-
-
-}
-
 
 
 /**
@@ -431,31 +450,28 @@ LISTAR PRODUTOS
 ==========================================================
 */
 
-function carregarProdutos(){
+
+async function buscarProdutos(){
 
 
 
-executar(
+const resposta =
 
-"apiListarProdutos",
+await executarAPI(
 
-null,
+"listarProdutos"
 
-function(res){
+);
 
 
 
-listaProdutos = res || [];
+listaProdutos =
+
+resposta.dados || [];
 
 
 
 mostrarProdutos();
-
-
-
-}
-
-);
 
 
 
@@ -469,6 +485,7 @@ MOSTRAR PRODUTOS
 ==========================================================
 */
 
+
 function mostrarProdutos(){
 
 
@@ -476,9 +493,7 @@ function mostrarProdutos(){
 let html = `
 
 
-
 <table>
-
 
 
 <thead>
@@ -488,29 +503,38 @@ let html = `
 
 
 <th>
+
 Produto
+
 </th>
 
 
 <th>
-Preço Consumidor
+
+Consumidor
+
 </th>
 
 
 <th>
-Preço Revenda
+
+Revenda
+
 </th>
 
 
 <th>
+
 Estoque
+
 </th>
 
 
 <th>
-Ações
-</th>
 
+Ações
+
+</th>
 
 
 </tr>
@@ -521,6 +545,7 @@ Ações
 
 
 <tbody>
+
 
 
 `;
@@ -534,14 +559,12 @@ listaProdutos.forEach(function(p){
 html += `
 
 
-
 <tr>
 
 
-
 <td>
 
-${p.nome || p[3]}
+${p.nome || ""}
 
 </td>
 
@@ -549,7 +572,7 @@ ${p.nome || p[3]}
 
 <td>
 
-${moeda(p.precoConsumidor || p[7])}
+${moeda(p.precoConsumidor)}
 
 </td>
 
@@ -557,7 +580,7 @@ ${moeda(p.precoConsumidor || p[7])}
 
 <td>
 
-${moeda(p.precoRevenda || p[6])}
+${moeda(p.precoRevenda)}
 
 </td>
 
@@ -565,14 +588,13 @@ ${moeda(p.precoRevenda || p[6])}
 
 <td>
 
-${p.estoque || p[8]}
+${p.estoque || 0}
 
 </td>
 
 
 
 <td>
-
 
 
 
@@ -580,7 +602,9 @@ ${p.estoque || p[8]}
 
 class="btn-primary"
 
-onclick="editarProduto('${p.id || p[1]}')">
+onclick="editarProduto('${p.id}')"
+
+>
 
 Editar
 
@@ -588,12 +612,13 @@ Editar
 
 
 
-
 <button
 
 class="btn-danger"
 
-onclick="excluirProduto('${p.id || p[1]}')">
+onclick="excluirProduto('${p.id}')"
+
+>
 
 Excluir
 
@@ -608,7 +633,6 @@ Excluir
 </tr>
 
 
-
 `;
 
 
@@ -620,9 +644,7 @@ Excluir
 html += `
 
 
-
 </tbody>
-
 
 
 </table>
@@ -653,23 +675,44 @@ EDITAR PRODUTO
 ==========================================================
 */
 
-function editarProduto(
+
+async function editarProduto(
 id
 ){
 
 
 
-executar(
+const resposta =
 
-"apiBuscarProduto",
+await executarAPI(
 
-id,
+"buscarProduto",
 
-function(p){
+{
+
+id:id
+
+}
+
+);
 
 
 
-produtoSelecionado = id;
+const p =
+
+resposta.dados;
+
+
+
+if(!p){
+
+return;
+
+}
+
+
+
+produtoSelecionado=id;
 
 
 
@@ -707,14 +750,6 @@ document.getElementById(
 
 document.getElementById(
 
-"produto_preco_revenda"
-
-).value = p.precoRevenda || 0;
-
-
-
-document.getElementById(
-
 "produto_preco_consumidor"
 
 ).value = p.precoConsumidor || 0;
@@ -723,23 +758,17 @@ document.getElementById(
 
 document.getElementById(
 
-"produto_estoque_minimo"
+"produto_preco_revenda"
 
-).value = p.estoqueMinimo || 0;
+).value = p.precoRevenda || 0;
 
 
 
 document.getElementById(
 
-"produto_observacao"
+"produto_estoque_minimo"
 
-).value = p.observacoes || "";
-
-
-
-}
-
-);
+).value = p.estoqueMinimo || 0;
 
 
 
@@ -753,7 +782,8 @@ EXCLUIR PRODUTO
 ==========================================================
 */
 
-function excluirProduto(
+
+async function excluirProduto(
 id
 ){
 
@@ -775,33 +805,39 @@ return;
 
 
 
-executar(
+const resposta =
 
-"apiExcluirProduto",
+await executarAPI(
 
-id,
+"excluirProduto",
 
-function(){
+{
+
+id:id
+
+}
+
+);
+
+
+
+if(resposta.sucesso){
 
 
 
 mensagem(
 
-"Produto excluído",
-
-"sucesso"
+"Produto excluído"
 
 );
 
 
 
-carregarProdutos();
+buscarProdutos();
 
 
 
 }
-
-);
 
 
 
@@ -811,9 +847,10 @@ carregarProdutos();
 
 /**
 ==========================================================
-LIMPAR FORMULÁRIO
+LIMPAR PRODUTO
 ==========================================================
 */
+
 
 function limparProduto(){
 
@@ -823,33 +860,18 @@ produtoSelecionado=null;
 
 
 
-const campos=[
-
-
-
+[
 "produto_codigo",
-
 "produto_nome",
-
 "produto_categoria",
-
-"produto_preco_revenda",
-
 "produto_preco_consumidor",
-
+"produto_preco_revenda",
 "produto_estoque",
+"produto_estoque_minimo"
 
-"produto_estoque_minimo",
+]
 
-"produto_observacao"
-
-
-
-];
-
-
-
-campos.forEach(function(id){
+.forEach(function(id){
 
 
 
