@@ -22,61 +22,120 @@
 <div id="app">
 
 
+
 <header class="header">
+
+
+<div class="logo-area">
+
+
+<img 
+
+src="assets/logo.png"
+
+alt="YES FREE"
+
+class="logo">
+
 
 <h1>
 YES FREE ERP
 </h1>
 
+
+</div>
+
+
+
+
 <nav>
 
-<button onclick="abrirTela('clientes')">
-Clientes
-</button>
-
-<button onclick="abrirTela('produtos')">
-Produtos
-</button>
-
-<button onclick="abrirTela('venda')">
-Novo Pedido
-</button>
 
 <button onclick="abrirTela('dashboard')">
+
 Dashboard
+
 </button>
+
+
+<button onclick="abrirTela('clientes')">
+
+Clientes
+
+</button>
+
+
+<button onclick="abrirTela('produtos')">
+
+Produtos
+
+</button>
+
+
+<button onclick="abrirTela('venda')">
+
+Novo Pedido
+
+</button>
+
+
+
+<button onclick="abrirTela('pedidos')">
+
+Pedidos
+
+</button>
+
+
+
+<button onclick="abrirTela('financeiro')">
+
+Financeiro
+
+</button>
+
+
 
 </nav>
 
+
 </header>
+
+
 
 
 
 <main id="conteudo">
 
 
-<section class="card">
+
+<div class="card">
 
 
 <h2>
-Sistema YES FREE
+YES FREE ERP
 </h2>
 
 
 <p>
-Gestão de clientes, vendas, estoque e financeiro.
+Sistema integrado de gestão de clientes, vendas, estoque e financeiro.
 </p>
 
 
+
 <button
-onclick="abrirTela('venda')"
-class="btn-primary"
->
-Novo Pedido
+
+onclick="abrirTela('dashboard')"
+
+class="btn-primary">
+
+Acessar Sistema
+
 </button>
 
 
-</section>
+</div>
+
 
 
 </main>
@@ -87,15 +146,55 @@ Novo Pedido
 
 
 
+
+
+<!-- COMPONENTES -->
+
+<?!= include("components/cliente"); ?>
+
+<?!= include("components/produto"); ?>
+
+<?!= include("components/venda"); ?>
+
+<?!= include("components/tabela"); ?>
+
+
+
+
+
+<!-- JAVASCRIPT -->
+
 <?!= include("js/app"); ?>
 
 <?!= include("js/clientes"); ?>
 
 <?!= include("js/produtos"); ?>
 
-<?!= include("js/pedidos"); ?>
+<?!= include("js/vendas"); ?>
 
 <?!= include("js/dashboard"); ?>
+
+
+
+
+
+<script>
+
+
+window.onload=function(){
+
+
+abrirTela(
+"dashboard"
+);
+
+
+};
+
+
+
+</script>
+
 
 
 </body>
