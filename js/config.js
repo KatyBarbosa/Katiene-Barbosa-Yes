@@ -2,29 +2,7 @@
 ==========================================================
 YES FREE ERP
 config.js
-Configuração principal Frontend
 GitHub Pages → Google Apps Script API
-==========================================================
-*/
-
-
-/**
-==========================================================
-URL DA API GOOGLE APPS SCRIPT
-==========================================================
-
-Substituir pelo endereço publicado:
-
-Implantar:
-Google Apps Script
-→ Implantar
-→ Nova implantação
-→ Aplicativo da Web
-→ Executar como: Você
-→ Quem tem acesso: Qualquer pessoa
-
-Copiar URL /exec
-
 ==========================================================
 */
 
@@ -35,12 +13,22 @@ const API_URL =
 
 
 
+const DATABASE_CONFIG = {
 
-/**
-==========================================================
-CONFIGURAÇÃO DO SISTEMA
-==========================================================
-*/
+
+nomePlanilha:
+
+"Pedidos",
+
+
+idPlanilha:
+
+"1rgYIXTXltzc7vCRQFhge0y_L7-V0UdPrMoImv77jolA"
+
+
+
+};
+
 
 
 const SISTEMA = {
@@ -51,11 +39,9 @@ nome:
 "Katiene Barbosa Yes",
 
 
-
 empresa:
 
 "Katiene Barbosa Yes",
-
 
 
 versao:
@@ -63,17 +49,14 @@ versao:
 "1.0.0",
 
 
-
 moeda:
 
 "BRL",
 
 
-
 idioma:
 
 "pt-BR",
-
 
 
 whatsapp:
@@ -86,28 +69,16 @@ whatsapp:
 
 
 
-
-/**
-==========================================================
-CHAMADA PADRÃO API
-==========================================================
-*/
-
-
 async function chamarAPI(
 acao,
 dados={}
 ){
 
 
-
 try{
 
 
-
-const resposta =
-
-await fetch(
+const resposta = await fetch(
 
 API_URL,
 
@@ -119,7 +90,6 @@ method:
 "POST",
 
 
-
 headers:{
 
 
@@ -129,7 +99,6 @@ headers:{
 
 
 },
-
 
 
 body:
@@ -144,12 +113,15 @@ acao,
 
 dados:
 
-dados
+dados,
 
+
+planilha:
+
+DATABASE_CONFIG.idPlanilha
 
 
 })
-
 
 
 }
@@ -158,20 +130,13 @@ dados
 
 
 
-const resultado =
-
-await resposta.json();
-
-
-
-return resultado;
+return await resposta.json();
 
 
 
 }
 
 catch(erro){
-
 
 
 console.error(
@@ -192,8 +157,7 @@ sucesso:false,
 
 mensagem:
 
-"Erro de conexão com servidor"
-
+"Falha de conexão com API"
 
 
 };
@@ -208,37 +172,14 @@ mensagem:
 
 
 
-/**
-==========================================================
-TESTE DE CONEXÃO
-==========================================================
-*/
-
-
 async function testarAPI(){
 
 
-
-const retorno =
-
-await chamarAPI(
+return await chamarAPI(
 
 "teste"
 
 );
-
-
-
-console.log(
-
-retorno
-
-);
-
-
-
-return retorno;
-
 
 
 }
