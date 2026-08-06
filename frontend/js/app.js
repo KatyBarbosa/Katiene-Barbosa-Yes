@@ -1,25 +1,16 @@
 /**
 ==========================================================
-YES FREE ERP
+KATIENE BARBOSA YES ERP
 app.js
 Controle principal SPA Frontend
-Google Apps Script Web App
+GitHub Pages → API REST → Google Apps Script
 ==========================================================
 */
 
-
-/**
-==========================================================
-VARIÁVEIS GLOBAIS
-==========================================================
-*/
-
-
-let sistema = {};
 
 let telaAtual = "";
 
-let dadosAplicacao = {};
+let sistemaDados = {};
 
 
 
@@ -29,33 +20,75 @@ INICIALIZAÇÃO
 ==========================================================
 */
 
-function iniciarSistema(){
+
+async function iniciarSistema(){
 
 
-
-google.script.run
-
-.withSuccessHandler(function(res){
+try{
 
 
-sistema = res;
+const resposta = await chamarAPI(
 
+"teste"
 
-
-console.log(
-"YES FREE iniciado",
-sistema
 );
 
 
 
-})
+if(resposta.sucesso){
 
-.apiInicial();
+
+console.log(
+
+"Sistema conectado",
+
+resposta
+
+);
+
+
+
+sistemaDados = resposta;
 
 
 
 }
+
+else{
+
+
+console.warn(
+
+"API sem resposta"
+
+);
+
+
+
+}
+
+
+
+}
+
+catch(erro){
+
+
+
+console.error(
+
+erro
+
+);
+
+
+
+}
+
+
+
+}
+
 
 
 
@@ -64,6 +97,7 @@ sistema
 NAVEGAÇÃO SPA
 ==========================================================
 */
+
 
 function abrirTela(
 tela
@@ -75,15 +109,17 @@ telaAtual = tela;
 
 
 
-const area =
+const conteudo =
 
 document.getElementById(
+
 "conteudo"
+
 );
 
 
 
-if(!area){
+if(!conteudo){
 
 return;
 
@@ -125,20 +161,10 @@ break;
 
 
 
-case "venda":
+case "vendas":
 
 
-telaVenda();
-
-
-break;
-
-
-
-case "pedidos":
-
-
-telaPedidos();
+telaVendas();
 
 
 break;
@@ -159,14 +185,16 @@ default:
 
 
 
-area.innerHTML =
+conteudo.innerHTML =
 
 `
 
 <div class="card">
 
 <h2>
+
 Tela não encontrada
+
 </h2>
 
 </div>
@@ -185,55 +213,34 @@ Tela não encontrada
 
 /**
 ==========================================================
-CARREGAR COMPONENTE HTML
+RENDERIZA HTML
 ==========================================================
 */
 
-function carregarComponente(
-id
-){
 
-
-
-const componente =
-
-document.getElementById(
-id
-);
-
-
-
-return componente
-?
-componente.innerHTML
-:
-"";
-
-
-
-}
-
-
-
-/**
-==========================================================
-CRIAR CONTEÚDO DINÂMICO
-==========================================================
-*/
-
-function criarHTML(
+function renderizar(
 html
 ){
 
 
 
-document
+const area =
 
-.getElementById(
+document.getElementById(
+
 "conteudo"
-)
 
-.innerHTML = html;
+);
+
+
+
+if(area){
+
+
+area.innerHTML = html;
+
+
+}
 
 
 
@@ -243,91 +250,139 @@ document
 
 /**
 ==========================================================
-MENSAGENS SISTEMA
+EXECUTAR API
 ==========================================================
 */
 
-function mensagem(
-texto,
-tipo
+
+async function executarAPI(
+acao,
+dados={},
+callback
 ){
 
 
 
-let cor = "";
+const resposta =
+
+await chamarAPI(
+
+acao,
+
+dados
+
+);
 
 
 
-switch(tipo){
+if(
 
+callback
 
-case "erro":
-
-cor="#dc3545";
-
-break;
+){
 
 
 
-case "sucesso":
+callback(
 
-cor="#28a745";
+resposta
 
-break;
+);
 
-
-
-default:
-
-cor="#002A47";
 
 
 }
 
 
 
-const box =
+return resposta;
+
+
+
+}
+
+
+
+/**
+==========================================================
+MENSAGENS
+==========================================================
+*/
+
+
+function mensagem(
+texto,
+tipo="sucesso"
+){
+
+
+
+const div =
 
 document.createElement(
+
 "div"
+
 );
 
 
 
-box.innerHTML = texto;
+div.className =
+
+"mensagem " + tipo;
 
 
 
-box.style.position="fixed";
-
-box.style.top="20px";
-
-box.style.right="20px";
-
-box.style.padding="15px";
-
-box.style.background=cor;
-
-box.style.color="white";
-
-box.style.borderRadius="8px";
-
-box.style.zIndex="9999";
+div.innerHTML = texto;
 
 
 
-document.body.appendChild(box);
+document.body.appendChild(
+
+div
+
+);
 
 
 
-setTimeout(function(){
+setTimeout(
+
+()=>{
 
 
-box.remove();
+div.remove();
 
 
-},3000);
 
+},
+
+3000
+
+);
+
+
+
+}
+
+
+
+/**
+==========================================================
+CONFIRMAÇÃO
+==========================================================
+*/
+
+
+function confirmar(
+texto
+){
+
+
+return confirm(
+
+texto
+
+);
 
 
 }
@@ -340,13 +395,18 @@ FORMATA MOEDA
 ==========================================================
 */
 
+
 function moeda(
 valor
 ){
 
 
 
-return Number(valor || 0)
+return Number(
+
+valor || 0
+
+)
 
 .toLocaleString(
 
@@ -354,9 +414,16 @@ return Number(valor || 0)
 
 {
 
-style:"currency",
 
-currency:"BRL"
+style:
+
+"currency",
+
+
+currency:
+
+"BRL"
+
 
 }
 
@@ -374,13 +441,14 @@ FORMATA DATA
 ==========================================================
 */
 
+
 function dataBR(
-data
+valor
 ){
 
 
 
-if(!data){
+if(!valor){
 
 return "";
 
@@ -388,10 +456,16 @@ return "";
 
 
 
-return new Date(data)
+return new Date(
+
+valor
+
+)
 
 .toLocaleDateString(
+
 "pt-BR"
+
 );
 
 
@@ -402,101 +476,21 @@ return new Date(data)
 
 /**
 ==========================================================
-CONFIRMAÇÃO
-==========================================================
-*/
-
-function confirmar(
-texto
-){
-
-
-return window.confirm(
-texto
-);
-
-
-}
-
-
-
-/**
-==========================================================
-EXECUTA GOOGLE SCRIPT
-==========================================================
-*/
-
-function executar(
-funcao,
-dados,
-sucesso
-){
-
-
-
-google.script.run
-
-
-
-.withSuccessHandler(function(res){
-
-
-
-if(sucesso){
-
-
-sucesso(res);
-
-
-}
-
-
-
-})
-
-
-
-.withFailureHandler(function(erro){
-
-
-
-mensagem(
-
-erro.message,
-
-"erro"
-
-);
-
-
-
-})
-
-
-
-[funcao](dados);
-
-
-
-}
-
-
-
-/**
-==========================================================
-INÍCIO
+CARREGAMENTO INICIAL
 ==========================================================
 */
 
 
-window.addEventListener(
+document.addEventListener(
 
-"load",
+"DOMContentLoaded",
 
 function(){
 
 
+
 iniciarSistema();
+
 
 
 }
