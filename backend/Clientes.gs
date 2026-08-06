@@ -1,11 +1,28 @@
 /**
 ==========================================================
-YES FREE ERP
+KATIENE BARBOSA YES ERP
 Clientes.gs
-Cadastro / Consulta / Edição / Exclusão / WhatsApp
-Base: ClientesConsumidorF
+
+Módulo:
+- Cadastro de clientes
+- Consulta
+- Edição
+- Exclusão
+- Busca
+
+Integração:
+
+Api.gs
+   ↓
+Clientes.gs
+   ↓
+Database.gs
+   ↓
+Google Sheets
+
 ==========================================================
 */
+
 
 
 /**
@@ -14,12 +31,17 @@ LISTAR CLIENTES
 ==========================================================
 */
 
+
 function listarClientes(){
 
 
-return dbListar(
-CONFIG.ABAS.CLIENTES
+
+return bancoListar(
+
+DATABASE.ABAS.CLIENTES
+
 );
+
 
 
 }
@@ -28,93 +50,97 @@ CONFIG.ABAS.CLIENTES
 
 /**
 ==========================================================
-BUSCAR CLIENTE POR ID
+SALVAR CLIENTE
 ==========================================================
 */
 
-function buscarCliente(
-id
+
+function salvarCliente(
+dados
 ){
 
 
 
-const registro =
+const agora =
 
-dbBuscarPorId(
-
-CONFIG.ABAS.CLIENTES,
-
-id
-
-);
+new Date();
 
 
 
-if(!registro){
+if(
 
-return null;
+!dados.nome
 
-}
-
-
-
-const c =
-registro.dados;
+){
 
 
 
 return {
 
 
-id:c[0],
+sucesso:false,
 
 
-nome:c[1],
+mensagem:
 
+"Nome do cliente obrigatório"
 
-tipoPessoa:c[2],
-
-
-cpf:c[3],
-
-
-dataCadastro:c[4],
-
-
-telefone:c[5],
-
-
-whatsapp:c[6],
-
-
-email:c[7],
-
-
-cep:c[8],
-
-
-endereco:c[9],
-
-
-numero:c[10],
-
-
-bairro:c[11],
-
-
-cidade:c[12],
-
-
-estado:c[13],
-
-
-observacoes:c[14],
-
-
-status:c[15]
 
 
 };
+
+
+
+}
+
+
+
+
+/**
+===========================
+NOVO CLIENTE
+===========================
+*/
+
+
+if(
+
+!dados.id
+
+){
+
+
+
+dados.ID =
+
+gerarID();
+
+
+
+dados.Data_Cadastro =
+
+agora;
+
+
+
+dados.Status =
+
+"ATIVO";
+
+
+
+return bancoInserir(
+
+DATABASE.ABAS.CLIENTES,
+
+mapearCliente(
+
+dados
+
+)
+
+);
+
 
 
 }
@@ -122,25 +148,44 @@ status:c[15]
 
 
 /**
+===========================
+ATUALIZA CLIENTE
+===========================
+*/
+
+
+return bancoAtualizar(
+
+DATABASE.ABAS.CLIENTES,
+
+dados.id,
+
+mapearCliente(
+
+dados
+
+)
+
+);
+
+
+
+}
+
+
+
+
+
+/**
 ==========================================================
-BUSCA INTELIGENTE
-ID + NOME + TELEFONE
+BUSCAR CLIENTE
 ==========================================================
 */
 
-function buscarClienteVenda(
-valor
+
+function buscarCliente(
+id
 ){
-
-
-
-valor =
-
-limparTexto(
-valor
-)
-
-.toLowerCase();
 
 
 
@@ -150,38 +195,72 @@ listarClientes();
 
 
 
-for(
-let i=0;
-i<clientes.length;
-i++
+const cliente =
+
+clientes.find(function(c){
+
+
+
+return String(c.ID)
+
+===
+
+String(id);
+
+
+
+});
+
+
+
+return cliente || null;
+
+
+
+}
+
+
+
+
+
+/**
+==========================================================
+EXCLUIR CLIENTE
+==========================================================
+*/
+
+
+function excluirCliente(
+id
 ){
 
 
 
-const c =
-clientes[i];
+return bancoExcluir(
+
+DATABASE.ABAS.CLIENTES,
+
+id
+
+);
 
 
 
-if(
-
-String(c[0])
-.toLowerCase()
-.includes(valor)
-
-||
+}
 
 
-String(c[1])
-.toLowerCase()
-.includes(valor)
-
-||
 
 
-String(c[6])
-.includes(valor)
 
+/**
+==========================================================
+MAPEAMENTO CAMPOS
+==========================================================
+*/
+
+
+function mapearCliente(
+dados
 ){
 
 
@@ -189,28 +268,58 @@ String(c[6])
 return {
 
 
-id:c[0],
+ID:
+
+dados.ID || dados.id || gerarID(),
 
 
-nome:c[1],
+
+Nome:
+
+dados.nome || "",
 
 
-cpf:c[3],
+
+Tipo:
+
+dados.tipo || "CONSUMIDOR",
 
 
-telefone:c[5],
+
+CPF_CNPJ:
+
+dados.cpfCnpj || "",
 
 
-whatsapp:c[6],
+
+Telefone:
+
+dados.telefone || "",
 
 
-email:c[7],
+
+Email:
+
+dados.email || "",
 
 
-cidade:c[12],
+
+Endereco:
+
+dados.endereco || "",
 
 
-endereco:c[9]
+
+Data_Cadastro:
+
+dados.Data_Cadastro || new Date(),
+
+
+
+Status:
+
+dados.Status || "ATIVO"
+
 
 
 };
@@ -221,465 +330,151 @@ endereco:c[9]
 
 
 
+
+
+/**
+==========================================================
+BUSCAR POR TELEFONE
+==========================================================
+*/
+
+
+function buscarClienteTelefone(
+telefone
+){
+
+
+
+const clientes =
+
+listarClientes();
+
+
+
+return clientes.filter(function(c){
+
+
+
+return String(c.Telefone)
+
+.includes(
+
+String(telefone)
+
+);
+
+
+
+});
+
+
+
 }
 
 
-
-return null;
-
-
-
-}
 
 
 
 /**
 ==========================================================
-CADASTRAR CLIENTE COMPLETO
+GERAR LINK WHATSAPP
 ==========================================================
 */
 
-function cadastrarClienteCompleto(
-dados
-){
 
-
-
-const id =
-
-gerarID(
-"CLI"
-);
-
-
-
-const linha = [
-
-
-
-id,
-
-
-dados.nome || "",
-
-
-dados.tipoPessoa || "FISICA",
-
-
-limparDocumento(
-dados.cpf
-),
-
-
-new Date(),
-
-
-limparTelefone(
-dados.telefone
-),
-
-
-limparTelefone(
-dados.whatsapp
-),
-
-
-dados.email || "",
-
-
-dados.cep || "",
-
-
-dados.endereco || "",
-
-
-dados.numero || "",
-
-
-dados.bairro || "",
-
-
-dados.cidade || "",
-
-
-dados.estado || "",
-
-
-dados.observacoes || "",
-
-
-CONFIG.STATUS.ATIVO
-
-
-
-];
-
-
-
-dbInserir(
-
-CONFIG.ABAS.CLIENTES,
-
-linha
-
-);
-
-
-
-registrarLog(
-
-"CLIENTE",
-
-"CRIADO",
-
-id
-
-);
-
-
-
-return resposta(
-
-true,
-
-"Cliente cadastrado",
-
-{
-
-id:id
-
-}
-
-);
-
-
-
-}
-
-
-
-/**
-==========================================================
-ATUALIZAR CLIENTE
-==========================================================
-*/
-
-function atualizarCliente(
-id,
-dados
-){
-
-
-
-const registro =
-
-dbBuscarPorId(
-
-CONFIG.ABAS.CLIENTES,
-
-id
-
-);
-
-
-
-if(!registro){
-
-
-return resposta(
-
-false,
-
-"Cliente não encontrado"
-
-);
-
-
-}
-
-
-
-let c =
-registro.dados;
-
-
-
-c[1] =
-dados.nome || c[1];
-
-
-c[2] =
-dados.tipoPessoa || c[2];
-
-
-c[3] =
-dados.cpf || c[3];
-
-
-c[5] =
-dados.telefone || c[5];
-
-
-c[6] =
-dados.whatsapp || c[6];
-
-
-c[7] =
-dados.email || c[7];
-
-
-c[8] =
-dados.cep || c[8];
-
-
-c[9] =
-dados.endereco || c[9];
-
-
-c[10] =
-dados.numero || c[10];
-
-
-c[11] =
-dados.bairro || c[11];
-
-
-c[12] =
-dados.cidade || c[12];
-
-
-c[13] =
-dados.estado || c[13];
-
-
-c[14] =
-dados.observacoes || c[14];
-
-
-
-dbAtualizarLinha(
-
-CONFIG.ABAS.CLIENTES,
-
-registro.linha,
-
-c
-
-);
-
-
-
-registrarLog(
-
-"CLIENTE",
-
-"ATUALIZADO",
-
-id
-
-);
-
-
-
-return resposta(
-
-true,
-
-"Cliente atualizado"
-
-);
-
-
-
-}
-
-
-
-/**
-==========================================================
-EXCLUIR CLIENTE
-==========================================================
-*/
-
-function excluirCliente(
+function gerarWhatsAppCliente(
 id
 ){
 
 
 
-const registro =
-
-dbBuscarPorId(
-
-CONFIG.ABAS.CLIENTES,
-
-id
-
-);
-
-
-
-if(!registro){
-
-return resposta(
-
-false,
-
-"Cliente não encontrado"
-
-);
-
-}
-
-
-
-dbExcluir(
-
-CONFIG.ABAS.CLIENTES,
-
-registro.linha
-
-);
-
-
-
-registrarLog(
-
-"CLIENTE",
-
-"EXCLUIDO",
-
-id
-
-);
-
-
-
-return resposta(
-
-true,
-
-"Cliente excluído"
-
-);
-
-
-
-}
-
-
-
-/**
-==========================================================
-GERAR MENSAGEM WHATSAPP CADASTRO
-==========================================================
-*/
-
-function enviarWhatsappCadastro(
-id
-){
-
-
-
-const c =
+const cliente =
 
 buscarCliente(
+
 id
+
 );
 
 
 
-if(!c){
+if(
 
-return null;
+!cliente
 
-}
-
-
-
-const mensagem =
-
-
-"Cadastro YES FREE%0A%0A"
-
-+
-
-"Nome completo: "
-
-+
-
-c.nome
-
-+
-
-"%0A"
-
-+
-
-"Endereço: "
-
-+
-
-c.endereco
-
-+
-
-"%0A"
-
-+
-
-"Telefone: "
-
-+
-
-c.telefone
-
-+
-
-"%0A"
-
-+
-
-"E-mail: "
-
-+
-
-c.email
-
-+
-
-"%0A"
-
-+
-
-"CPF ou CNPJ: "
-
-+
-
-c.cpf;
+){
 
 
 
 return {
 
 
-telefone:
-
-"559198819899"
+sucesso:false,
 
 
+mensagem:
 
-,
+"Cliente não encontrado"
 
+
+
+};
+
+
+
+}
+
+
+
+const numero =
+
+String(
+
+cliente.Telefone
+
+)
+
+.replace(
+
+/\D/g,
+
+""
+
+);
+
+
+
+const texto =
+
+encodeURIComponent(
+
+"Olá "
+
++
+
+cliente.Nome
+
++
+
+", tudo bem? Aqui é da Katiene Barbosa Yes."
+
+);
+
+
+
+return {
+
+
+sucesso:true,
 
 
 url:
 
-"https://wa.me/"
+"https://wa.me/55"
 
 +
 
-"559198819899"
+numero
 
 +
 
@@ -687,7 +482,7 @@ url:
 
 +
 
-mensagem
+texto
 
 
 
