@@ -1,20 +1,17 @@
-/**
-==========================================================
+<style>
+
+/* ==========================================================
 YES FREE ERP
 CSS PRINCIPAL
 frontend/css/style.html
-==========================================================
-*/
+========================================================== */
 
 
 *{
 
 box-sizing:border-box;
 
-font-family:
-Arial,
-Helvetica,
-sans-serif;
+font-family:Arial, Helvetica, sans-serif;
 
 }
 
@@ -24,7 +21,7 @@ body{
 
 margin:0;
 
-background:#f5f7fa;
+background:#f4f6f8;
 
 color:#333;
 
@@ -32,9 +29,7 @@ color:#333;
 
 
 
-/**
- HEADER
-*/
+/* HEADER */
 
 .header{
 
@@ -64,21 +59,21 @@ font-size:24px;
 
 
 
-nav button{
+.header nav button{
 
-background:white;
-
-color:#002A47;
-
-border:none;
+margin-left:8px;
 
 padding:10px 15px;
 
-margin-left:8px;
+border:none;
 
 border-radius:6px;
 
 cursor:pointer;
+
+background:#9AD1F5;
+
+color:#002A47;
 
 font-weight:bold;
 
@@ -86,7 +81,7 @@ font-weight:bold;
 
 
 
-nav button:hover{
+.header nav button:hover{
 
 opacity:.85;
 
@@ -94,9 +89,7 @@ opacity:.85;
 
 
 
-/**
- CONTEÚDO
-*/
+/* CONTAINER */
 
 #conteudo{
 
@@ -106,37 +99,33 @@ padding:25px;
 
 
 
-/**
- CARDS
-*/
+/* CARDS */
 
 .card{
 
 background:white;
 
-padding:25px;
-
 border-radius:10px;
 
-box-shadow:
-0 2px 8px rgba(0,0,0,.15);
+padding:20px;
 
 margin-bottom:20px;
+
+box-shadow:0 2px 8px rgba(0,0,0,.08);
 
 }
 
 
 
-/**
- FORMULÁRIOS
-*/
+/* FORMULÁRIOS */
 
 .form-grid{
 
 display:grid;
 
 grid-template-columns:
-repeat(2,1fr);
+
+repeat(auto-fit,minmax(220px,1fr));
 
 gap:15px;
 
@@ -164,35 +153,35 @@ margin-bottom:5px;
 
 
 
-.form-group input,
-.form-group select,
-.form-group textarea{
-
+input,
+select,
+textarea{
 
 padding:10px;
 
-border:
+border:1px solid #ccc;
 
-1px solid #ccc;
+border-radius:6px;
 
-border-radius:5px;
-
-
-}
-
-
-
-textarea{
-
-resize:vertical;
+font-size:14px;
 
 }
 
 
 
-/**
- BOTÕES
-*/
+input:focus,
+select:focus,
+textarea:focus{
+
+outline:none;
+
+border-color:#002A47;
+
+}
+
+
+
+/* BOTÕES */
 
 button{
 
@@ -204,19 +193,15 @@ cursor:pointer;
 
 .btn-primary{
 
-
-background:#0077b6;
+background:#002A47;
 
 color:white;
 
+padding:10px 18px;
+
 border:none;
 
-padding:12px 20px;
-
 border-radius:6px;
-
-font-weight:bold;
-
 
 }
 
@@ -224,16 +209,15 @@ font-weight:bold;
 
 .btn-success{
 
-background:#198754;
+background:#28a745;
 
 color:white;
 
-border:none;
-
 padding:10px 18px;
 
-border-radius:6px;
+border:none;
 
+border-radius:6px;
 
 }
 
@@ -245,20 +229,17 @@ background:#dc3545;
 
 color:white;
 
-border:none;
-
 padding:10px 18px;
 
-border-radius:6px;
+border:none;
 
+border-radius:6px;
 
 }
 
 
 
-/**
- TABELAS
-*/
+/* TABELAS */
 
 table{
 
@@ -280,6 +261,8 @@ color:white;
 
 padding:10px;
 
+text-align:left;
+
 }
 
 
@@ -288,85 +271,13 @@ table td{
 
 padding:10px;
 
-border-bottom:
-
-1px solid #ddd;
+border-bottom:1px solid #ddd;
 
 }
 
 
 
-/**
- SIDEBAR
-*/
-
-.sidebar{
-
-
-position:fixed;
-
-right:0;
-
-top:0;
-
-height:100%;
-
-width:420px;
-
-background:white;
-
-box-shadow:
-
--3px 0 10px rgba(0,0,0,.2);
-
-padding:20px;
-
-display:none;
-
-overflow:auto;
-
-
-}
-
-
-
-.sidebar.active{
-
-display:block;
-
-}
-
-
-
-/**
- PRODUTOS PEDIDO
-*/
-
-.item-pedido{
-
-display:flex;
-
-gap:10px;
-
-align-items:center;
-
-margin-bottom:10px;
-
-}
-
-
-
-.item-pedido input{
-
-width:80px;
-
-}
-
-
-
-/**
- DASHBOARD
-*/
+/* DASHBOARD */
 
 .dashboard-grid{
 
@@ -374,10 +285,9 @@ display:grid;
 
 grid-template-columns:
 
-repeat(4,1fr);
+repeat(auto-fit,minmax(200px,1fr));
 
-gap:15px;
-
+gap:20px;
 
 }
 
@@ -385,17 +295,15 @@ gap:15px;
 
 .indicador{
 
-
 background:white;
 
 padding:20px;
 
 border-radius:10px;
 
-box-shadow:
+text-align:center;
 
-0 2px 6px rgba(0,0,0,.1);
-
+box-shadow:0 2px 8px rgba(0,0,0,.08);
 
 }
 
@@ -403,9 +311,7 @@ box-shadow:
 
 .indicador h3{
 
-margin:0;
-
-font-size:14px;
+margin-top:0;
 
 }
 
@@ -417,34 +323,26 @@ font-size:28px;
 
 font-weight:bold;
 
-color:#0077b6;
+color:#002A47;
 
 }
 
 
 
-/**
- MOBILE
-*/
+/* RESULTADOS BUSCA */
 
-@media(max-width:768px){
+#clientes_resultado,
+#produtos_resultado{
 
+background:white;
 
-.form-grid{
+border:1px solid #ddd;
 
-grid-template-columns:1fr;
+border-radius:5px;
 
-}
+position:absolute;
 
-
-.dashboard-grid{
-
-grid-template-columns:1fr;
-
-}
-
-
-.sidebar{
+z-index:10;
 
 width:100%;
 
@@ -452,4 +350,56 @@ width:100%;
 
 
 
+.resultado-item{
+
+padding:8px;
+
+cursor:pointer;
+
 }
+
+
+
+.resultado-item:hover{
+
+background:#f1f1f1;
+
+}
+
+
+
+/* RESPONSIVO */
+
+@media(max-width:768px){
+
+
+.header{
+
+flex-direction:column;
+
+gap:15px;
+
+}
+
+
+.header nav{
+
+display:flex;
+
+flex-wrap:wrap;
+
+}
+
+
+#conteudo{
+
+padding:10px;
+
+}
+
+
+
+}
+
+
+</style>
