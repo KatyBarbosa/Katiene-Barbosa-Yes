@@ -1,10 +1,18 @@
 /**
 ==========================================================
-YES FREE ERP
+KATIENE BARBOSA YES ERP
 clientes.js
 Cadastro / Consulta / Edição / Exclusão de Clientes
-Integração:
-Frontend → Api.gs → Clientes.gs → Google Sheets
+
+Frontend
+↓
+chamarAPI()
+↓
+Api.gs
+↓
+Clientes.gs
+↓
+Google Sheets
 ==========================================================
 */
 
@@ -21,16 +29,21 @@ TELA CLIENTES
 ==========================================================
 */
 
+
 function telaClientes(){
 
 
-criarHTML(`
+
+renderizar(`
+
 
 <div class="card">
 
 
 <h2>
+
 Cadastro de Clientes
+
 </h2>
 
 
@@ -42,21 +55,26 @@ Cadastro de Clientes
 <div class="form-group">
 
 <label>
+
 Nome completo
+
 </label>
 
-<input 
-id="cliente_nome"
-type="text">
+
+<input id="cliente_nome">
+
 
 </div>
+
 
 
 
 <div class="form-group">
 
 <label>
+
 Tipo Cliente
+
 </label>
 
 
@@ -64,12 +82,16 @@ Tipo Cliente
 
 
 <option value="CONSUMIDOR">
+
 Consumidor
+
 </option>
 
 
 <option value="REVENDA">
+
 Revenda
+
 </option>
 
 
@@ -83,14 +105,15 @@ Revenda
 
 <div class="form-group">
 
+
 <label>
+
 CPF ou CNPJ
+
 </label>
 
 
-<input 
-id="cliente_documento"
-type="text">
+<input id="cliente_documento">
 
 
 </div>
@@ -100,14 +123,15 @@ type="text">
 
 <div class="form-group">
 
+
 <label>
+
 Telefone
+
 </label>
 
 
-<input 
-id="cliente_telefone"
-type="text">
+<input id="cliente_telefone">
 
 
 </div>
@@ -117,14 +141,15 @@ type="text">
 
 <div class="form-group">
 
+
 <label>
+
 E-mail
+
 </label>
 
 
-<input 
-id="cliente_email"
-type="email">
+<input id="cliente_email">
 
 
 </div>
@@ -134,14 +159,15 @@ type="email">
 
 <div class="form-group">
 
+
 <label>
+
 Endereço
+
 </label>
 
 
-<input 
-id="cliente_endereco"
-type="text">
+<input id="cliente_endereco">
 
 
 </div>
@@ -159,22 +185,28 @@ type="text">
 
 class="btn-primary"
 
-onclick="salvarCliente()">
+onclick="salvarCliente()"
+
+>
 
 Salvar Cliente
 
 </button>
 
 
+
 <button
 
 class="btn-success"
 
-onclick="buscarClientes()">
+onclick="buscarClientes()"
+
+>
 
 Consultar
 
 </button>
+
 
 
 
@@ -183,7 +215,6 @@ Consultar
 
 
 <div id="lista_clientes">
-
 
 </div>
 
@@ -199,6 +230,7 @@ Consultar
 buscarClientes();
 
 
+
 }
 
 
@@ -209,7 +241,8 @@ SALVAR CLIENTE
 ==========================================================
 */
 
-function salvarCliente(){
+
+async function salvarCliente(){
 
 
 
@@ -224,42 +257,59 @@ clienteSelecionado,
 nome:
 
 document.getElementById(
+
 "cliente_nome"
+
 ).value,
+
 
 
 tipo:
 
 document.getElementById(
+
 "cliente_tipo"
+
 ).value,
+
 
 
 cpfCnpj:
 
 document.getElementById(
+
 "cliente_documento"
+
 ).value,
+
 
 
 telefone:
 
 document.getElementById(
+
 "cliente_telefone"
+
 ).value,
+
 
 
 email:
 
 document.getElementById(
+
 "cliente_email"
+
 ).value,
+
 
 
 endereco:
 
 document.getElementById(
+
 "cliente_endereco"
+
 ).value
 
 
@@ -268,31 +318,31 @@ document.getElementById(
 
 
 
-executar(
+const resposta =
 
-"apiSalvarCliente",
+await executarAPI(
 
-dados,
+"salvarCliente",
 
-function(res){
-
-
-
-if(res.sucesso){
-
-
-
-mensagem(
-
-"Cliente salvo com sucesso",
-
-"sucesso"
+dados
 
 );
 
 
 
-limparFormularioCliente();
+if(resposta.sucesso){
+
+
+
+mensagem(
+
+"Cliente salvo com sucesso"
+
+);
+
+
+
+limparCliente();
 
 
 
@@ -307,7 +357,7 @@ else{
 
 mensagem(
 
-res.mensagem,
+resposta.mensagem,
 
 "erro"
 
@@ -321,12 +371,6 @@ res.mensagem,
 
 }
 
-);
-
-
-
-}
-
 
 
 /**
@@ -335,31 +379,28 @@ LISTAR CLIENTES
 ==========================================================
 */
 
-function buscarClientes(){
+
+async function buscarClientes(){
 
 
 
-executar(
+const resposta =
 
-"apiListarClientes",
+await executarAPI(
 
-null,
-
-function(res){
-
-
-
-listaClientes = res || [];
-
-
-
-renderizarClientes();
-
-
-
-}
+"listarClientes"
 
 );
+
+
+
+listaClientes =
+
+resposta.dados || [];
+
+
+
+mostrarClientes();
 
 
 
@@ -373,7 +414,8 @@ MOSTRAR CLIENTES
 ==========================================================
 */
 
-function renderizarClientes(){
+
+function mostrarClientes(){
 
 
 
@@ -385,37 +427,42 @@ let html = `
 
 <thead>
 
-
 <tr>
 
 <th>
+
 Nome
+
 </th>
 
 
 <th>
+
 Telefone
+
 </th>
 
 
 <th>
+
 Tipo
+
 </th>
 
 
 <th>
+
 Ações
+
 </th>
 
 
 </tr>
 
-
 </thead>
 
 
 <tbody>
-
 
 `;
 
@@ -433,7 +480,7 @@ html += `
 
 <td>
 
-${c.nome || c[1]}
+${c.nome || ""}
 
 </td>
 
@@ -441,7 +488,7 @@ ${c.nome || c[1]}
 
 <td>
 
-${c.telefone || c[5]}
+${c.telefone || ""}
 
 </td>
 
@@ -449,20 +496,23 @@ ${c.telefone || c[5]}
 
 <td>
 
-${c.tipo || c[3]}
+${c.tipo || ""}
 
 </td>
 
 
 
 <td>
+
 
 
 <button
 
 class="btn-primary"
 
-onclick="editarCliente('${c.id || c[0]}')">
+onclick="editarCliente('${c.id}')"
+
+>
 
 Editar
 
@@ -474,7 +524,9 @@ Editar
 
 class="btn-danger"
 
-onclick="excluirCliente('${c.id || c[0]}')">
+onclick="excluirCliente('${c.id}')"
+
+>
 
 Excluir
 
@@ -486,11 +538,14 @@ Excluir
 
 class="btn-success"
 
-onclick="whatsappCliente('${c.id || c[0]}')">
+onclick="whatsappCliente('${c.id}')"
+
+>
 
 WhatsApp
 
 </button>
+
 
 
 </td>
@@ -514,8 +569,6 @@ html += `
 </tbody>
 
 </table>
-
-
 
 `;
 
@@ -541,23 +594,44 @@ EDITAR CLIENTE
 ==========================================================
 */
 
-function editarCliente(
+
+async function editarCliente(
 id
 ){
 
 
 
-executar(
+const resposta =
 
-"apiBuscarCliente",
+await executarAPI(
 
-id,
+"buscarCliente",
 
-function(c){
+{
+
+id:id
+
+}
+
+);
 
 
 
-clienteSelecionado = id;
+const c =
+
+resposta.dados;
+
+
+
+if(!c){
+
+return;
+
+}
+
+
+
+clienteSelecionado=id;
 
 
 
@@ -568,11 +642,13 @@ document.getElementById(
 ).value = c.nome || "";
 
 
+
 document.getElementById(
 
 "cliente_tipo"
 
 ).value = c.tipo || "CONSUMIDOR";
+
 
 
 document.getElementById(
@@ -582,11 +658,13 @@ document.getElementById(
 ).value = c.cpfCnpj || "";
 
 
+
 document.getElementById(
 
 "cliente_telefone"
 
 ).value = c.telefone || "";
+
 
 
 document.getElementById(
@@ -596,17 +674,12 @@ document.getElementById(
 ).value = c.email || "";
 
 
+
 document.getElementById(
 
 "cliente_endereco"
 
 ).value = c.endereco || "";
-
-
-
-}
-
-);
 
 
 
@@ -620,15 +693,19 @@ EXCLUIR CLIENTE
 ==========================================================
 */
 
-function excluirCliente(
+
+async function excluirCliente(
 id
 ){
 
 
 
 if(
+
 !confirmar(
+
 "Excluir cliente?"
+
 )
 
 ){
@@ -639,20 +716,29 @@ return;
 
 
 
-executar(
+const resposta =
 
-"apiExcluirCliente",
+await executarAPI(
 
-id,
+"excluirCliente",
 
-function(res){
+{
+
+id:id
+
+}
+
+);
+
+
+
+if(resposta.sucesso){
+
 
 
 mensagem(
 
-"Cliente excluído",
-
-"sucesso"
+"Cliente excluído"
 
 );
 
@@ -663,8 +749,6 @@ buscarClientes();
 
 
 }
-
-);
 
 
 
@@ -678,29 +762,40 @@ WHATSAPP CLIENTE
 ==========================================================
 */
 
-function whatsappCliente(
+
+async function whatsappCliente(
 id
 ){
 
 
 
-executar(
+const resposta =
 
-"apiWhatsappCliente",
+await executarAPI(
 
-id,
+"whatsappCliente",
 
-function(res){
+{
+
+id:id
+
+}
+
+);
 
 
 
-if(res.url){
+if(
+
+resposta.url
+
+){
 
 
 
 window.open(
 
-res.url,
+resposta.url,
 
 "_blank"
 
@@ -714,12 +809,6 @@ res.url,
 
 }
 
-);
-
-
-
-}
-
 
 
 /**
@@ -728,47 +817,43 @@ LIMPAR FORMULÁRIO
 ==========================================================
 */
 
-function limparFormularioCliente(){
+
+function limparCliente(){
 
 
 
-clienteSelecionado = null;
+clienteSelecionado=null;
 
 
 
-document.getElementById(
-
-"cliente_nome"
-
-).value="";
-
-
-document.getElementById(
-
-"cliente_documento"
-
-).value="";
-
-
-document.getElementById(
-
-"cliente_telefone"
-
-).value="";
-
-
-document.getElementById(
-
-"cliente_email"
-
-).value="";
-
-
-document.getElementById(
-
+[
+"cliente_nome",
+"cliente_documento",
+"cliente_telefone",
+"cliente_email",
 "cliente_endereco"
 
-).value="";
+]
+
+.forEach(function(id){
+
+
+
+const campo =
+
+document.getElementById(id);
+
+
+
+if(campo){
+
+campo.value="";
+
+}
+
+
+
+});
 
 
 
