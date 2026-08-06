@@ -1,21 +1,120 @@
 /**
 ==========================================================
-YES FREE ERP
+KATIENE BARBOSA YES ERP
 Database.gs
-Camada de banco de dados Google Sheets
-CRUD centralizado
+
+Camada de acesso ao banco de dados
+
+Responsável por:
+- Conexão com Google Sheets
+- Controle das abas
+- Leitura
+- Escrita
+- Atualização
+- Exclusão
+- Criação automática das estruturas
+
+Banco:
+Google Planilha
+ID:
+1rgYIXTXltzc7vCRQFhge0y_L7-V0UdPrMoImv77jolA
+
 ==========================================================
 */
 
 
 /**
- * Retorna planilha ativa
- */
-function getSpreadsheet(){
+==========================================================
+CONFIGURAÇÃO BANCO
+==========================================================
+*/
 
 
-return SpreadsheetApp
-.getActive();
+const DATABASE = {
+
+
+ID:
+
+"1rgYIXTXltzc7vCRQFhge0y_L7-V0UdPrMoImv77jolA",
+
+
+
+NOME:
+
+"Pedidos",
+
+
+
+ABAS:{
+
+
+CLIENTES:
+
+"Clientes",
+
+
+PRODUTOS:
+
+"Produtos",
+
+
+PEDIDOS:
+
+"Pedidos",
+
+
+ITENS_PEDIDOS:
+
+"Itens_Pedidos",
+
+
+ESTOQUE:
+
+"Estoque",
+
+
+FINANCEIRO:
+
+"Financeiro",
+
+
+DASHBOARD:
+
+"Dashboard",
+
+
+LOGS:
+
+"Logs"
+
+
+
+}
+
+
+
+};
+
+
+
+
+/**
+==========================================================
+ABRIR PLANILHA
+==========================================================
+*/
+
+
+function abrirBanco(){
+
+
+
+return SpreadsheetApp.openById(
+
+DATABASE.ID
+
+);
+
 
 
 }
@@ -23,27 +122,46 @@ return SpreadsheetApp
 
 
 /**
- * Retorna aba pelo nome
- */
-function getAba(
+==========================================================
+PEGAR ABA
+==========================================================
+*/
+
+
+function obterAba(
 nome
 ){
 
 
-const aba =
-getSpreadsheet()
-.getSheetByName(nome);
+
+const planilha =
+
+abrirBanco();
+
+
+
+let aba =
+
+planilha.getSheetByName(
+
+nome
+
+);
 
 
 
 if(!aba){
 
 
-throw new Error(
-"Aba não encontrada: "
-+
+
+aba =
+
+planilha.insertSheet(
+
 nome
+
 );
+
 
 
 }
@@ -53,31 +171,276 @@ nome
 return aba;
 
 
+
 }
 
 
 
 /**
- * Listar dados da aba
- */
-function dbListar(
-aba
-){
+==========================================================
+CRIAR ESTRUTURA BANCO
+==========================================================
+*/
 
 
-const sheet =
-getAba(aba);
+function inicializarBanco(){
 
 
 
-const ultima =
-sheet.getLastRow();
+const estrutura = {
+
+
+
+Clientes:[
+
+"ID",
+
+"Nome",
+
+"Tipo",
+
+"CPF_CNPJ",
+
+"Telefone",
+
+"Email",
+
+"Endereco",
+
+"Data_Cadastro",
+
+"Status"
+
+],
+
+
+
+Produtos:[
+
+"ID",
+
+"Codigo",
+
+"Nome",
+
+"Categoria",
+
+"Unidade",
+
+"Preco_Consumidor",
+
+"Preco_Revenda",
+
+"Estoque",
+
+"Estoque_Minimo",
+
+"Status"
+
+],
+
+
+
+Pedidos:[
+
+"ID",
+
+"Data",
+
+"Cliente",
+
+"Tipo",
+
+"Total",
+
+"Desconto",
+
+"Frete",
+
+"Status"
+
+],
+
+
+
+Itens_Pedidos:[
+
+"ID",
+
+"Pedido_ID",
+
+"Produto",
+
+"Quantidade",
+
+"Valor",
+
+"Subtotal"
+
+],
+
+
+
+Estoque:[
+
+"ID",
+
+"Produto",
+
+"Entrada",
+
+"Saida",
+
+"Saldo",
+
+"Data"
+
+],
+
+
+
+Financeiro:[
+
+"ID",
+
+"Pedido",
+
+"Tipo",
+
+"Valor",
+
+"Status",
+
+"Data"
+
+],
+
+
+
+Logs:[
+
+"ID",
+
+"Data",
+
+"Usuario",
+
+"Acao"
+
+]
+
+
+
+};
+
+
+
+
+
+Object.keys(estrutura)
+
+.forEach(function(nome){
+
+
+
+const aba =
+
+obterAba(
+
+nome
+
+);
 
 
 
 if(
-ultima <=1
+
+aba.getLastRow()
+
+===0
+
 ){
+
+
+
+aba
+
+.appendRow(
+
+estrutura[nome]
+
+);
+
+
+
+}
+
+
+
+});
+
+
+
+
+return {
+
+
+sucesso:true,
+
+
+mensagem:
+
+"Banco inicializado"
+
+
+
+};
+
+
+
+}
+
+
+
+
+
+/**
+==========================================================
+LER TODOS REGISTROS
+==========================================================
+*/
+
+
+function bancoListar(
+abaNome
+){
+
+
+
+const aba =
+
+obterAba(
+
+abaNome
+
+);
+
+
+
+const dados =
+
+aba.getDataRange()
+
+.getValues();
+
+
+
+if(
+
+dados.length<=1
+
+){
+
 
 return [];
 
@@ -85,21 +448,39 @@ return [];
 
 
 
-return sheet
+const cabecalho =
 
-.getRange(
+dados.shift();
 
-2,
 
-1,
 
-ultima-1,
+return dados.map(function(linha){
 
-sheet.getLastColumn()
 
-)
 
-.getValues();
+let objeto={};
+
+
+
+cabecalho.forEach(function(coluna,index){
+
+
+
+objeto[coluna]=
+
+linha[index];
+
+
+
+});
+
+
+
+return objeto;
+
+
+
+});
 
 
 
@@ -108,107 +489,279 @@ sheet.getLastColumn()
 
 
 /**
- * Inserir uma linha
- */
-function dbInserir(
-aba,
+==========================================================
+INSERIR REGISTRO
+==========================================================
+*/
+
+
+function bancoInserir(
+abaNome,
 dados
 ){
 
 
-const sheet =
-getAba(aba);
 
+const aba =
 
+obterAba(
 
-sheet
+abaNome
 
-.appendRow(
-dados
 );
 
 
 
-return true;
+const cabecalho =
 
+aba
 
-}
+.getRange(
 
+1,
 
+1,
 
-/**
- * Inserir várias linhas
- */
-function dbInserirLote(
-aba,
-dados
-){
+1,
 
+aba.getLastColumn()
 
-if(
-!dados ||
-dados.length===0
-){
+)
 
-return false;
-
-}
-
-
-
-const sheet =
-getAba(aba);
+.getValues()[0];
 
 
 
 const linha =
-sheet.getLastRow()+1;
+
+cabecalho.map(function(coluna){
 
 
 
-sheet
+return dados[coluna] || "";
+
+
+
+});
+
+
+
+aba.appendRow(
+
+linha
+
+);
+
+
+
+return {
+
+
+sucesso:true
+
+
+};
+
+
+
+}
+
+
+
+
+
+/**
+==========================================================
+ATUALIZAR REGISTRO
+==========================================================
+*/
+
+
+function bancoAtualizar(
+abaNome,
+id,
+dados
+){
+
+
+
+const registros =
+
+bancoListar(
+
+abaNome
+
+);
+
+
+
+const aba =
+
+obterAba(
+
+abaNome
+
+);
+
+
+
+const colunaID = 1;
+
+
+
+for(
+
+let i=0;
+
+i<registros.length;
+
+i++
+
+){
+
+
+
+if(
+
+String(registros[i].ID)
+
+===
+
+String(id)
+
+){
+
+
+
+const linha = i+2;
+
+
+
+const cabecalho =
+
+aba
+
+.getRange(
+
+1,
+
+1,
+
+1,
+
+aba.getLastColumn()
+
+)
+
+.getValues()[0];
+
+
+
+cabecalho.forEach(function(coluna,index){
+
+
+
+if(
+
+dados[coluna]!==undefined
+
+){
+
+
+
+aba
 
 .getRange(
 
 linha,
 
-1,
-
-dados.length,
-
-dados[0].length
+index+1
 
 )
 
-.setValues(
-dados
+.setValue(
+
+dados[coluna]
+
 );
 
-
-
-return true;
 
 
 }
 
 
 
+});
+
+
+
+return {
+
+
+sucesso:true
+
+
+};
+
+
+
+}
+
+
+
+}
+
+
+
+return {
+
+
+sucesso:false,
+
+
+mensagem:
+
+"Registro não encontrado"
+
+
+
+};
+
+
+
+}
+
+
+
+
+
 /**
- * Buscar registro pelo ID primeira coluna
- */
-function dbBuscarPorId(
-aba,
+==========================================================
+EXCLUIR REGISTRO
+==========================================================
+*/
+
+
+function bancoExcluir(
+abaNome,
 id
 ){
 
 
-const sheet =
-getAba(aba);
+
+const aba =
+
+obterAba(
+
+abaNome
+
+);
 
 
 
 const dados =
-sheet
+
+aba
 
 .getDataRange()
 
@@ -217,172 +770,48 @@ sheet
 
 
 for(
-let i=1;
-i<dados.length;
-i++
+
+let i=dados.length-1;
+
+i>0;
+
+i--
+
 ){
+
 
 
 if(
+
 String(dados[i][0])
+
 ===
+
 String(id)
+
 ){
+
+
+
+aba
+
+.deleteRow(
+
+i+1
+
+);
+
 
 
 return {
 
 
-linha:
-i+1,
-
-
-dados:
-dados[i]
+sucesso:true
 
 
 };
 
 
-}
-
-
-}
-
-
-
-return null;
-
-
-}
-
-
-
-/**
- * Atualizar campos específicos
- */
-function dbAtualizarCampos(
-aba,
-linha,
-campos
-){
-
-
-const sheet =
-getAba(aba);
-
-
-
-Object.keys(campos)
-
-.forEach(function(coluna){
-
-
-sheet
-
-.getRange(
-
-linha,
-
-Number(coluna)
-
-)
-
-.setValue(
-campos[coluna]
-);
-
-
-
-});
-
-
-
-return true;
-
-
-}
-
-
-
-/**
- * Excluir registro
- */
-function dbExcluir(
-aba,
-linha
-){
-
-
-const sheet =
-getAba(aba);
-
-
-
-sheet
-
-.deleteRow(
-linha
-);
-
-
-
-return true;
-
-
-}
-
-
-
-/**
- * Contar registros
- */
-function dbContar(
-aba
-){
-
-
-return dbListar(aba)
-.length;
-
-
-}
-
-
-
-/**
- * Executar transação protegida
- */
-function dbTransacao(
-funcao
-){
-
-
-const lock =
-LockService
-.getScriptLock();
-
-
-
-try{
-
-
-lock.waitLock(30000);
-
-
-
-return funcao();
-
-
-
-}
-
-finally{
-
-
-lock.releaseLock();
-
-
 
 }
 
@@ -392,112 +821,20 @@ lock.releaseLock();
 
 
 
-/**
- * Procurar por campo
- */
-function dbBuscar(
-aba,
-coluna,
-valor
-){
+return {
 
 
-const dados =
-dbListar(aba);
+sucesso:false,
+
+
+mensagem:
+
+"Registro não encontrado"
 
 
 
-return dados.filter(function(linha){
+};
 
-
-return String(
-linha[coluna]
-)
-
-.toLowerCase()
-
-.includes(
-
-String(valor)
-
-.toLowerCase()
-
-);
-
-
-
-});
-
-
-}
-
-
-
-/**
- * Atualizar linha completa
- */
-function dbAtualizarLinha(
-aba,
-linha,
-dados
-){
-
-
-const sheet =
-getAba(aba);
-
-
-
-sheet
-
-.getRange(
-
-linha,
-
-1,
-
-1,
-
-dados.length
-
-)
-
-.setValues(
-[dados]
-);
-
-
-
-return true;
-
-
-}
-
-
-
-/**
- * Criar backup simples
- */
-function dbBackup(){
-
-
-const ss =
-getSpreadsheet();
-
-
-
-const copia =
-ss.copy(
-"BACKUP YES FREE "
-+
-formatarData(
-agora()
-)
-);
-
-
-
-return copia.getId();
 
 
 }
