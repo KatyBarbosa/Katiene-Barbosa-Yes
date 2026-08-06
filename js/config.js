@@ -31,7 +31,7 @@ Copiar URL /exec
 
 const API_URL =
 
-"https://script.google.com/macros/s/SEU_ID_DA_IMPLANTACAO/exec";
+"https://script.google.com/macros/s/AKfycbyjMeqqz3WiX4nG6Q3Bwbt5dJx7_mmgqAUc68KHyb4BZZh41JTQ3C4FNoD6elFIeNFI0A/exec";
 
 
 
@@ -48,13 +48,13 @@ const SISTEMA = {
 
 nome:
 
-"YES FREE ERP",
+"Katiene Barbosa Yes",
 
 
 
 empresa:
 
-"YES FREE",
+"Katiene Barbosa Yes",
 
 
 
