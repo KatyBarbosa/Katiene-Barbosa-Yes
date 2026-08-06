@@ -1,16 +1,28 @@
 /**
 ==========================================================
-YES FREE ERP
+KATIENE BARBOSA YES ERP
 Produtos.gs
-Cadastro / Consulta / Preços / Estoque
-==========================================================
 
-Regras:
-- Produto consumidor usa PRECO_CONSUMIDOR
-- Revenda usa PRECO_REVENDA
-- Estoque controlado pela aba Estoque
+Módulo:
+- Cadastro de produtos
+- Consulta
+- Edição
+- Exclusão
+- Controle inicial de estoque
+
+Integração:
+
+Api.gs
+   ↓
+Produtos.gs
+   ↓
+Database.gs
+   ↓
+Google Sheets
+
 ==========================================================
 */
+
 
 
 /**
@@ -19,130 +31,188 @@ LISTAR PRODUTOS
 ==========================================================
 */
 
+
 function listarProdutos(){
 
 
-return dbListar(
-CONFIG.ABAS.PRODUTOS
+return bancoListar(
+
+DATABASE.ABAS.PRODUTOS
+
 );
 
 
 }
+
 
 
 
 /**
 ==========================================================
-BUSCAR PRODUTO POR ID
+SALVAR PRODUTO
 ==========================================================
 */
 
-function buscarProdutoId(
-id
+
+function salvarProduto(
+dados
 ){
 
 
-const registro =
 
-dbBuscarPorId(
+if(
 
-CONFIG.ABAS.PRODUTOS,
+!dados.nome
 
-id
-
-);
-
-
-
-if(!registro){
-
-return null;
-
-}
-
-
-
-const p =
-registro.dados;
+){
 
 
 
 return {
 
 
-dataCadastro:p[0],
+sucesso:false,
 
 
-id:p[1],
+mensagem:
 
+"Nome do produto obrigatório"
 
-codigo:p[2],
-
-
-nome:p[3],
-
-
-categoria:p[4],
-
-
-unidade:p[5],
-
-
-precoRevenda:Number(p[6]||0),
-
-
-precoConsumidor:Number(p[7]||0),
-
-
-estoque:Number(p[8]||0),
-
-
-estoqueMinimo:Number(p[9]||0),
-
-
-status:p[10],
-
-
-observacoes:p[11],
-
-
-atualizadoEm:p[12],
-
-
-embalagem:p[13],
-
-
-pesoVolume:p[14],
-
-
-ativo:p[15]
 
 
 };
+
 
 
 }
 
 
 
+
+
 /**
-==========================================================
-BUSCA INTELIGENTE
-NOME / CODIGO / ID
-==========================================================
+=============================
+NOVO PRODUTO
+=============================
 */
 
-function buscarProduto(
-nome
+
+if(
+
+!dados.id
+
 ){
 
 
 
-nome =
+const produto = mapearProduto(
 
-limparTexto(nome)
+dados
 
-.toLowerCase();
+);
+
+
+
+produto.ID = gerarID();
+
+
+
+produto.Status = "ATIVO";
+
+
+
+const resultado =
+
+bancoInserir(
+
+DATABASE.ABAS.PRODUTOS,
+
+produto
+
+);
+
+
+
+/**
+CRIAR ESTOQUE INICIAL
+*/
+
+
+if(
+
+resultado.sucesso
+
+&&
+
+dados.estoque
+
+){
+
+
+
+registrarEstoqueProduto(
+
+produto.ID,
+
+dados.estoque
+
+);
+
+
+
+}
+
+
+
+return resultado;
+
+
+
+}
+
+
+
+
+
+/**
+=============================
+ATUALIZA PRODUTO
+=============================
+*/
+
+
+return bancoAtualizar(
+
+DATABASE.ABAS.PRODUTOS,
+
+dados.id,
+
+mapearProduto(
+
+dados
+
+)
+
+);
+
+
+
+}
+
+
+
+
+
+/**
+==========================================================
+BUSCAR PRODUTO
+==========================================================
+*/
+
+
+function buscarProduto(
+id
+){
 
 
 
@@ -152,45 +222,72 @@ listarProdutos();
 
 
 
-for(
-let i=0;
-i<produtos.length;
-i++
+const produto =
+
+produtos.find(function(p){
+
+
+
+return String(p.ID)
+
+===
+
+String(id);
+
+
+
+});
+
+
+
+return produto || null;
+
+
+
+}
+
+
+
+
+
+/**
+==========================================================
+EXCLUIR PRODUTO
+==========================================================
+*/
+
+
+function excluirProduto(
+id
 ){
 
 
 
-const p =
-produtos[i];
+return bancoExcluir(
+
+DATABASE.ABAS.PRODUTOS,
+
+id
+
+);
 
 
 
-if(
-
-String(p[1])
-
-.toLowerCase()
-
-.includes(nome)
-
-||
+}
 
 
-String(p[2])
-
-.toLowerCase()
-
-.includes(nome)
-
-||
 
 
-String(p[3])
 
-.toLowerCase()
+/**
+==========================================================
+MAPEAMENTO CAMPOS
+==========================================================
+*/
 
-.includes(nome)
 
+function mapearProduto(
+dados
 ){
 
 
@@ -198,31 +295,81 @@ String(p[3])
 return {
 
 
-id:p[1],
+
+ID:
+
+dados.ID || dados.id || gerarID(),
 
 
-codigo:p[2],
+
+Codigo:
+
+dados.codigo || "",
 
 
-nome:p[3],
+
+Nome:
+
+dados.nome || "",
 
 
-categoria:p[4],
+
+Categoria:
+
+dados.categoria || "",
 
 
-preco:
 
-Number(p[7]||0),
+Unidade:
 
-
-precoRevenda:
-
-Number(p[6]||0),
+dados.unidade || "UN",
 
 
-estoque:
 
-Number(p[8]||0)
+Preco_Consumidor:
+
+Number(
+
+dados.precoConsumidor || 0
+
+),
+
+
+
+Preco_Revenda:
+
+Number(
+
+dados.precoRevenda || 0
+
+),
+
+
+
+Estoque:
+
+Number(
+
+dados.estoque || 0
+
+),
+
+
+
+Estoque_Minimo:
+
+Number(
+
+dados.estoqueMinimo || 0
+
+),
+
+
+
+Status:
+
+dados.Status || "ATIVO"
+
 
 
 };
@@ -233,442 +380,231 @@ Number(p[8]||0)
 
 
 
+
+
+/**
+==========================================================
+BUSCAR PRODUTO POR NOME
+==========================================================
+*/
+
+
+function buscarProdutoNome(
+nome
+){
+
+
+
+const produtos =
+
+listarProdutos();
+
+
+
+return produtos.filter(function(p){
+
+
+
+return String(
+
+p.Nome
+
+)
+
+.toLowerCase()
+
+.includes(
+
+String(nome)
+
+.toLowerCase()
+
+);
+
+
+
+});
+
+
+
 }
 
 
-
-return null;
-
-
-
-}
 
 
 
 /**
 ==========================================================
-CADASTRAR PRODUTO
+ALTERAR ESTOQUE PRODUTO
 ==========================================================
 */
 
-function cadastrarProdutoCompleto(
-dados
-){
 
-
-
-const id =
-
-gerarID(
-"PRO"
-);
-
-
-
-const linha = [
-
-
-
-new Date(),
-
-
+function atualizarEstoqueProduto(
 id,
 
-
-dados.codigo || "",
-
-
-dados.nome || "",
-
-
-dados.categoria || "",
-
-
-dados.unidade || "UN",
-
-
-Number(dados.precoRevenda||0),
-
-
-Number(dados.precoConsumidor||0),
-
-
-Number(dados.estoque||0),
-
-
-Number(dados.estoqueMinimo||0),
-
-
-CONFIG.STATUS.ATIVO,
-
-
-dados.observacoes || "",
-
-
-new Date(),
-
-
-dados.embalagem || "",
-
-
-dados.pesoVolume || "",
-
-
-true
-
-
-
-];
-
-
-
-dbInserir(
-
-CONFIG.ABAS.PRODUTOS,
-
-linha
-
-);
-
-
-
-/*
-Cria controle inicial estoque
-*/
-
-criarEstoqueProduto(
-id,
-dados.nome,
-dados.categoria,
-dados.estoque || 0,
-dados.estoqueMinimo || 0
-);
-
-
-
-registrarLog(
-
-"PRODUTO",
-
-"CRIADO",
-
-id
-
-);
-
-
-
-return resposta(
-
-true,
-
-"Produto cadastrado",
-
-{
-
-id:id
-
-}
-
-);
-
-
-
-}
-
-
-
-/**
-==========================================================
-ATUALIZAR PRODUTO
-==========================================================
-*/
-
-function atualizarProduto(
-id,
-dados
-){
-
-
-
-const registro =
-
-dbBuscarPorId(
-
-CONFIG.ABAS.PRODUTOS,
-
-id
-
-);
-
-
-
-if(!registro){
-
-
-return resposta(
-
-false,
-
-"Produto não encontrado"
-
-);
-
-
-}
-
-
-
-let p =
-registro.dados;
-
-
-
-p[2] =
-dados.codigo || p[2];
-
-
-p[3] =
-dados.nome || p[3];
-
-
-p[4] =
-dados.categoria || p[4];
-
-
-p[5] =
-dados.unidade || p[5];
-
-
-p[6] =
-Number(dados.precoRevenda || p[6]);
-
-
-p[7] =
-Number(dados.precoConsumidor || p[7]);
-
-
-p[9] =
-Number(dados.estoqueMinimo || p[9]);
-
-
-p[11] =
-dados.observacoes || p[11];
-
-
-p[12] =
-new Date();
-
-
-
-dbAtualizarLinha(
-
-CONFIG.ABAS.PRODUTOS,
-
-registro.linha,
-
-p
-
-);
-
-
-
-registrarLog(
-
-"PRODUTO",
-
-"ATUALIZADO",
-
-id
-
-);
-
-
-
-return resposta(
-
-true,
-
-"Produto atualizado"
-
-);
-
-
-
-}
-
-
-
-/**
-==========================================================
-EXCLUIR PRODUTO
-==========================================================
-*/
-
-function excluirProduto(
-id
-){
-
-
-
-const registro =
-
-dbBuscarPorId(
-
-CONFIG.ABAS.PRODUTOS,
-
-id
-
-);
-
-
-
-if(!registro){
-
-return resposta(
-
-false,
-
-"Produto não encontrado"
-
-);
-
-}
-
-
-
-dbExcluir(
-
-CONFIG.ABAS.PRODUTOS,
-
-registro.linha
-
-);
-
-
-
-registrarLog(
-
-"PRODUTO",
-
-"EXCLUIDO",
-
-id
-
-);
-
-
-
-return resposta(
-
-true,
-
-"Produto excluído"
-
-);
-
-
-
-}
-
-
-
-/**
-==========================================================
-OBTER PREÇO POR TIPO VENDA
-==========================================================
-*/
-
-function obterPrecoProduto(
-idProduto,
-tipoVenda
-){
-
-
-
-const p =
-
-buscarProdutoId(
-idProduto
-);
-
-
-
-if(!p){
-
-return 0;
-
-}
-
-
-
-if(
-tipoVenda ===
-"REVENDA"
-){
-
-
-return p.precoRevenda;
-
-
-}
-
-
-
-return p.precoConsumidor;
-
-
-
-}
-
-
-
-/**
-==========================================================
-VERIFICAR ESTOQUE DISPONÍVEL
-==========================================================
-*/
-
-function verificarEstoqueProduto(
-idProduto,
 quantidade
 ){
 
 
 
-const p =
+const produto =
 
-buscarProdutoId(
-idProduto
+buscarProduto(
+
+id
+
 );
 
 
 
-if(!p){
-
-return false;
-
-}
-
-
-
 if(
-CONFIG.REGRAS.PERMITIR_ESTOQUE_NEGATIVO
+
+!produto
+
 ){
 
-return true;
+
+
+return {
+
+
+sucesso:false,
+
+
+mensagem:
+
+"Produto não encontrado"
+
+
+
+};
+
+
 
 }
 
 
 
-return (
+const novoEstoque =
 
-Number(p.estoque)
 
->=
+Number(
 
-Number(quantidade)
+produto.Estoque
+
+)
+
++
+
+Number(
+
+quantidade
+
+);
+
+
+
+
+return bancoAtualizar(
+
+DATABASE.ABAS.PRODUTOS,
+
+id,
+
+{
+
+
+Estoque:
+
+novoEstoque
+
+
+
+}
+
+);
+
+
+
+}
+
+
+
+
+/**
+==========================================================
+ESTOQUE INICIAL
+==========================================================
+*/
+
+
+function registrarEstoqueProduto(
+produtoID,
+
+quantidade
+){
+
+
+
+const estoque = {
+
+
+
+ID:
+
+gerarID(),
+
+
+
+Produto_ID:
+
+produtoID,
+
+
+
+Entrada:
+
+Number(
+
+quantidade
+
+),
+
+
+
+Saida:
+
+0,
+
+
+
+Saldo:
+
+Number(
+
+quantidade
+
+),
+
+
+
+Data:
+
+new Date()
+
+
+
+};
+
+
+
+
+return bancoInserir(
+
+DATABASE.ABAS.ESTOQUE,
+
+estoque
 
 );
 
