@@ -1,392 +1,571 @@
 /**
 ==========================================================
-YES FREE ERP
-API.gs
-Camada de comunicação Frontend ↔ Apps Script ↔ Sheets
+KATIENE BARBOSA YES ERP
+Api.gs
+
+API REST PRINCIPAL
+
+Recebe:
+GitHub Pages
+    ↓
+POST JSON
+    ↓
+doPost(e)
+
+Envia:
+    ↓
+Clientes.gs
+    ↓
+Produtos.gs
+    ↓
+Pedidos.gs
+    ↓
+Dashboard.gs
+    ↓
+Google Sheets
+
 ==========================================================
 */
 
 
 /**
- * Dados iniciais do sistema
- */
-function apiInicial(){
+==========================================================
+CONFIGURAÇÃO CORS
+==========================================================
+*/
 
 
-return {
+function doOptions(e){
 
 
-sistema:{
+return ContentService
 
-nome:
-CONFIG.EMPRESA.NOME,
+.createTextOutput("")
 
-versao:
-CONFIG.EMPRESA.VERSAO
+.setMimeType(
 
-},
+ContentService.MimeType.TEXT
 
-
-usuario:{
-
-nome:
-Session
-.getActiveUser()
-.getEmail()
+);
 
 }
 
-
-};
-
-
-}
 
 
 
 /**
 ==========================================================
+POST PRINCIPAL
+==========================================================
+*/
+
+
+function doPost(e){
+
+
+
+try{
+
+
+const requisicao =
+
+JSON.parse(
+
+e.postData.contents
+
+);
+
+
+
+const acao =
+
+requisicao.acao;
+
+
+
+const dados =
+
+requisicao.dados || {};
+
+
+
+
+
+let resposta;
+
+
+
+switch(acao){
+
+
+
+/**
+==============================
+TESTE API
+==============================
+*/
+
+
+case "teste":
+
+
+
+resposta = {
+
+
+sucesso:true,
+
+
+mensagem:
+
+"API YES FREE ONLINE",
+
+
+sistema:
+
+"KATIENE BARBOSA YES ERP"
+
+
+
+};
+
+
+
+break;
+
+
+
+/**
+==============================
 CLIENTES
-==========================================================
+==============================
 */
 
 
-function apiListarClientes(){
-
-
-const dados =
-listarClientes();
+case "listarClientes":
 
 
 
-return dados.map(function(c){
+resposta = {
 
 
-return {
+sucesso:true,
 
 
-id:c[0],
+dados:
 
-nome:c[1],
+listarClientes()
 
-tipoPessoa:c[2],
-
-cpf:c[3],
-
-telefone:c[5],
-
-whatsapp:c[6],
-
-email:c[7],
-
-cidade:c[12],
-
-endereco:c[9],
-
-status:c[15]
 
 
 };
 
 
-});
 
+break;
 
-}
 
 
 
-function apiBuscarClienteVenda(valor){
+case "salvarCliente":
 
 
-return buscarClienteVenda(valor);
 
+resposta =
 
-}
+salvarCliente(
 
+dados
 
-
-function apiBuscarCliente(id){
-
-
-return buscarCliente(id);
-
-
-}
-
-
-
-function apiSalvarCliente(dados){
-
-
-return cadastrarClienteCompleto(dados);
-
-
-}
-
-
-
-/**
-==========================================================
-PRODUTOS
-==========================================================
-*/
-
-
-function apiListarProdutos(){
-
-
-const dados =
-listarProdutos();
-
-
-
-return dados.map(function(p){
-
-
-return {
-
-
-id:p[1],
-
-codigo:p[2],
-
-nome:p[3],
-
-categoria:p[4],
-
-unidade:p[5],
-
-precoRevenda:
-p[6],
-
-preco:
-p[7],
-
-estoque:
-p[8]
-
-
-};
-
-
-});
-
-
-}
-
-
-
-function apiBuscarProduto(nome){
-
-
-return buscarProduto(nome);
-
-
-}
-
-
-
-function apiSalvarProduto(dados){
-
-
-return cadastrarProdutoCompleto(dados);
-
-
-}
-
-
-
-/**
-==========================================================
-PEDIDOS
-==========================================================
-*/
-
-
-function apiSalvarPedido(dados){
-
-
-return salvarPedidoCompleto(dados);
-
-
-}
-
-
-
-function apiListarPedidos(){
-
-
-return listarPedidos();
-
-
-}
-
-
-
-/**
-==========================================================
-DASHBOARD
-==========================================================
-*/
-
-
-function apiDashboard(){
-
-
-return montarDashboard();
-
-
-}
-
-
-
-/**
-==========================================================
-PDF
-==========================================================
-*/
-
-
-function apiGerarPDF(
-idPedido,
-tipo
-){
-
-
-return gerarPDF(
-idPedido,
-tipo
 );
 
 
-}
+
+break;
 
 
 
-/**
-==========================================================
-WHATSAPP
-==========================================================
-*/
 
-
-function apiWhatsappCliente(
-idCliente
-){
-
-
-return enviarWhatsappCadastro(
-idCliente
-);
-
-
-}
+case "buscarCliente":
 
 
 
-function apiWhatsappPedido(
-idPedido,
-tipo
-){
+resposta = {
 
 
-return enviarWhatsappPedido(
-idPedido,
-tipo
-);
+sucesso:true,
 
 
-}
+dados:
 
+buscarCliente(
 
+dados.id
 
-/**
-==========================================================
-ESTOQUE
-==========================================================
-*/
-
-
-function apiEstoque(){
-
-
-return listarEstoque();
-
-
-}
-
-
-
-/**
-==========================================================
-FINANCEIRO
-==========================================================
-*/
-
-
-function apiFinanceiro(){
-
-
-return listarContasReceber();
-
-
-}
-
-
-
-/**
-==========================================================
-RELATÓRIOS
-==========================================================
-*/
-
-
-function apiRelatorioVendas(
-inicio,
-fim
-){
-
-
-return relatorioVendas(
-inicio,
-fim
-);
-
-
-}
-
-
-
-function apiRelatorioFinanceiro(){
-
-
-return relatorioFinanceiro();
-
-
-}
-
-
-
-/**
-==========================================================
-UPLOAD / INCLUDE HTML
-==========================================================
-*/
-
-
-function include(
-arquivo
-){
-
-
-return HtmlService
-
-.createHtmlOutputFromFile(
-arquivo
 )
 
-.getContent();
+
+
+};
+
+
+
+break;
+
+
+
+
+case "excluirCliente":
+
+
+
+resposta =
+
+excluirCliente(
+
+dados.id
+
+);
+
+
+
+break;
+
+
+
+
+/**
+==============================
+PRODUTOS
+==============================
+*/
+
+
+case "listarProdutos":
+
+
+
+resposta = {
+
+
+sucesso:true,
+
+
+dados:
+
+listarProdutos()
+
+
+
+};
+
+
+
+break;
+
+
+
+
+case "salvarProduto":
+
+
+
+resposta =
+
+salvarProduto(
+
+dados
+
+);
+
+
+
+break;
+
+
+
+
+case "buscarProduto":
+
+
+
+resposta = {
+
+
+sucesso:true,
+
+
+dados:
+
+buscarProduto(
+
+dados.id
+
+)
+
+
+
+};
+
+
+
+break;
+
+
+
+
+case "excluirProduto":
+
+
+
+resposta =
+
+excluirProduto(
+
+dados.id
+
+);
+
+
+
+break;
+
+
+
+
+/**
+==============================
+PEDIDOS
+==============================
+*/
+
+
+case "salvarPedido":
+
+
+
+resposta =
+
+salvarPedido(
+
+dados
+
+);
+
+
+
+break;
+
+
+
+
+/**
+==============================
+PDF
+==============================
+*/
+
+
+case "gerarPDF":
+
+
+
+resposta =
+
+gerarPDF(
+
+dados.id
+
+);
+
+
+
+break;
+
+
+
+
+/**
+==============================
+WHATSAPP
+==============================
+*/
+
+
+case "whatsappCliente":
+
+
+
+resposta =
+
+gerarWhatsAppCliente(
+
+dados.id
+
+);
+
+
+
+break;
+
+
+
+case "whatsappPedido":
+
+
+
+resposta =
+
+gerarWhatsAppPedido(
+
+dados.id
+
+);
+
+
+
+break;
+
+
+
+
+/**
+==============================
+DASHBOARD
+==============================
+*/
+
+
+case "dashboard":
+
+
+
+resposta = {
+
+
+sucesso:true,
+
+
+dados:
+
+gerarDashboard()
+
+
+
+};
+
+
+
+break;
+
+
+
+
+default:
+
+
+
+resposta = {
+
+
+sucesso:false,
+
+
+mensagem:
+
+"Ação não encontrada: "
+
++
+
+acao
+
+
+
+};
+
+
+
+}
+
+
+
+
+
+return respostaJSON(
+
+resposta
+
+);
+
+
+
+}
+
+catch(erro){
+
+
+
+return respostaJSON({
+
+
+
+sucesso:false,
+
+
+mensagem:
+
+erro.message,
+
+
+linha:
+
+erro.stack
+
+
+
+});
+
+
+
+}
+
+
+
+}
+
+
+
+/**
+==========================================================
+RETORNO JSON
+==========================================================
+*/
+
+
+function respostaJSON(
+dados
+){
+
+
+
+return ContentService
+
+.createTextOutput(
+
+JSON.stringify(
+
+dados
+
+)
+
+)
+
+.setMimeType(
+
+ContentService.MimeType.JSON
+
+);
+
 
 
 }
