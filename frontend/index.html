@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>YES FREE ERP</title>
+
+
+<?!= include("css/style"); ?>
+
+
+</head>
+
+
+<body>
+
+
+<div id="app">
+
+
+<header class="header">
+
+<h1>
+YES FREE ERP
+</h1>
+
+<nav>
+
+<button onclick="abrirTela('clientes')">
+Clientes
+</button>
+
+<button onclick="abrirTela('produtos')">
+Produtos
+</button>
+
+<button onclick="abrirTela('venda')">
+Novo Pedido
+</button>
+
+<button onclick="abrirTela('dashboard')">
+Dashboard
+</button>
+
+</nav>
+
+</header>
+
+
+
+<main id="conteudo">
+
+
+<section class="card">
+
+
+<h2>
+Sistema YES FREE
+</h2>
+
+
+<p>
+Gestão de clientes, vendas, estoque e financeiro.
+</p>
+
+
+<button
+onclick="abrirTela('venda')"
+class="btn-primary"
+>
+Novo Pedido
+</button>
+
+
+</section>
+
+
+</main>
+
+
+
+</div>
+
+
+
+<?!= include("js/app"); ?>
+
+<?!= include("js/clientes"); ?>
+
+<?!= include("js/produtos"); ?>
+
+<?!= include("js/pedidos"); ?>
+
+<?!= include("js/dashboard"); ?>
+
+
+</body>
+
+</html>
