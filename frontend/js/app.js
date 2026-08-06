@@ -1,0 +1,3 @@
+frontend/
+└── js/
+    └── app.js
