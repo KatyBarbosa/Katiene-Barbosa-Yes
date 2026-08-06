@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>YES FREE ERP</title>
+
+
+<?!= include("css/style"); ?>
+
+
+</head>
+
+
+<body>
+
+
+<div id="app">
+
+
+
+<header class="header">
+
+
+<div class="logo-area">
+
+
+<img 
+
+src="assets/logo.png"
+
+alt="YES FREE"
+
+class="logo">
+
+
+<h1>
+YES FREE ERP
+</h1>
+
+
+</div>
+
+
+
+
+<nav>
+
+
+<button onclick="abrirTela('dashboard')">
+
+Dashboard
+
+</button>
+
+
+<button onclick="abrirTela('clientes')">
+
+Clientes
+
+</button>
+
+
+<button onclick="abrirTela('produtos')">
+
+Produtos
+
+</button>
+
+
+<button onclick="abrirTela('venda')">
+
+Novo Pedido
+
+</button>
+
+
+
+<button onclick="abrirTela('pedidos')">
+
+Pedidos
+
+</button>
+
+
+
+<button onclick="abrirTela('financeiro')">
+
+Financeiro
+
+</button>
+
+
+
+</nav>
+
+
+</header>
+
+
+
+
+
+<main id="conteudo">
+
+
+
+<div class="card">
+
+
+<h2>
+YES FREE ERP
+</h2>
+
+
+<p>
+Sistema integrado de gestão de clientes, vendas, estoque e financeiro.
+</p>
+
+
+
+<button
+
+onclick="abrirTela('dashboard')"
+
+class="btn-primary">
+
+Acessar Sistema
+
+</button>
+
+
+</div>
+
+
+
+</main>
+
+
+
+</div>
+
+
+
+
+
+<!-- COMPONENTES -->
+
+<?!= include("components/cliente"); ?>
+
+<?!= include("components/produto"); ?>
+
+<?!= include("components/venda"); ?>
+
+<?!= include("components/tabela"); ?>
+
+
+
+
+
+<!-- JAVASCRIPT -->
+
+<?!= include("js/app"); ?>
+
+<?!= include("js/clientes"); ?>
+
+<?!= include("js/produtos"); ?>
+
+<?!= include("js/vendas"); ?>
+
+<?!= include("js/dashboard"); ?>
+
+
+
+
+
+<script>
+
+
+window.onload=function(){
+
+
+abrirTela(
+"dashboard"
+);
+
+
+};
+
+
+
+</script>
+
+
+
+</body>
+
+</html>
